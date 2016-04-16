@@ -1,0 +1,5 @@
+#N canvas 449 291 450 300 10;
+#X obj 112 105 VCA;
+#X obj 99 27 ENV;
+#X obj 56 194 MIDI;
+#X obj 259 233 unpackOSC;

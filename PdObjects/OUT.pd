@@ -1,0 +1,7 @@
+#N canvas 1594 822 85 97 10;
+#X obj 8 60 dac~;
+#X obj 8 29 inlet~;
+#X obj 29 5 inlet~;
+#X connect 1 0 0 0;
+#X connect 2 0 0 1;
+#X coords 0 300 1 299 100 60 0;
