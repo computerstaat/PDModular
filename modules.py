@@ -36,6 +36,21 @@ modules = {"VCO":[
     ["Slider", "FREQ", "freq"],
     ["List", [["Input", "1V/O"],["Output", "OUT"]]],
   ],
+  "LPF":[
+    ["Slider", "FREQ", "cut"],
+    ["Slider", "AMNT", "vcamnt"],
+    ["Slider", "FREQ", "res"],
+    ["List", [["Input", "VC"],["Input", "IN"],["Output", "OUT"]]],
+  ],
+  "BPF":[
+    ["Slider", "FREQ", "cut"],
+    ["Slider", "FREQ", "res"],
+    ["List", [["Input", "IN"],["Output", "OUT"]]],
+  ],
+  "SAWRAMP":[
+    ["Slider", "FREQ", "freq"],
+    ["List", [["Input", "1V/O"],["Output", "RAMP"],["Output", "SAW"]]],
+  ],
   "ATN":[
     ["Slider", "AMNT", "amount"],
     ["List", [["Input", "IN"],["Output", "OUT"]]],
@@ -48,6 +63,10 @@ modules = {"VCO":[
   "SLFO":[
     ["Slider", "FREQ", "freq"],
     ["List", [["Output", "OUT"]]],
+  ],
+  "MLFO":[
+    ["Slider", "FREQ", "freq"],
+    ["List", [["Output", "SINE"],["Output", "SQUARE"],["Output", "SAW"],["Output", "RAMP"],["Output", "TRI"]]],
   ],
   "ADSR": [
     ["List", [["Input", "GATE"]]],

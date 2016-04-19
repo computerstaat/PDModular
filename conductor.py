@@ -151,12 +151,19 @@ class Conductor():
             print "UP"
             lcd.clear()
             self.LCDcounter = max(self.LCDcounter - 1, 0)
-            lcd.message(self.synthesizers[self.LCDcounter])
+            name = self.synthesizers[self.LCDcounter]
+            if(name == self.currentPatch):
+                name = "[" + name + "]"
+            lcd.message(name)
+
         elif lcd.is_pressed(LCD.DOWN):
             print "DOWN"
             lcd.clear()
             self.LCDcounter = min(self.LCDcounter + 1, len(self.synthesizers))
-            lcd.message(self.synthesizers[self.LCDcounter])
+            name = self.synthesizers[self.LCDcounter]
+            if(name == self.currentPatch):
+                name = "[" + name + "]"
+            lcd.message(name)
 
     # This needs to parse message correctly
     def midiCheck():
@@ -177,6 +184,7 @@ class Conductor():
         server.bind(("localhost", 9999))
         server.listen(10)
         inputs = [server]
+        lcd.message("["+ DEFAULTPATCH+ "]")
         while inputs:
             self.midiCheck()
             self.LCDchecker()
