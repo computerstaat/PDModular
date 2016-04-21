@@ -6,7 +6,7 @@
 #X floatatom 73 233 5 0 0 0 - - -;
 #X obj 73 175 routeOSC /SLFO;
 #X obj 73 262 * 25;
-#X obj 232 205 loadbang;
+#X obj 232 205 initbang;
 #X msg 244 237 0.2;
 #X connect 1 0 0 0;
 #X connect 2 0 5 0;

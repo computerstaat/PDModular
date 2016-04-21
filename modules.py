@@ -39,7 +39,7 @@ modules = {"VCO":[
   "LPF":[
     ["Slider", "FREQ", "cut"],
     ["Slider", "AMNT", "vcamnt"],
-    ["Slider", "FREQ", "res"],
+    ["Slider", "RES", "res"],
     ["List", [["Input", "VC"],["Input", "IN"],["Output", "OUT"]]],
   ],
   "BPF":[

@@ -2,7 +2,7 @@
 #X text 155 -56 ENV;
 #X text 101 -55 INPUT;
 #X msg 359 47 0.5;
-#X obj 359 21 loadbang;
+#X obj 359 21 initbang;
 #X obj 106 -38 inlet~;
 #X obj 159 -36 inlet~;
 #X obj 252 77 *~;

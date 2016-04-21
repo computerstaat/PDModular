@@ -13,7 +13,7 @@
 #X obj 265 99 *~;
 #X obj 315 43 inlet~;
 #X obj 315 97 *~;
-#X obj 251 -29 loadbang;
+#X obj 251 -29 initbang;
 #X msg 250 -6 0.5;
 #X obj 135 126 +~;
 #X obj 265 128 +~;

@@ -9,7 +9,7 @@
 #X obj 121 -20 * 2;
 #X obj 175 -20 * 2;
 #X obj 211 -21 * 2;
-#X obj 99 -240 loadbang;
+#X obj 99 -240 initbang;
 #X msg 99 -213 0.5;
 #X obj 0 27 *~;
 #X obj 51 26 *~;

@@ -18,7 +18,7 @@
 #X obj 29 181 +~;
 #X obj 123 112 * 8000;
 #X obj 29 138 *~;
-#X obj 121 -15 loadbang;
+#X obj 121 -15 initbang;
 #X msg 121 15 0.5;
 #X msg 80 16 0;
 #X obj 225 44 routeOSC /LPF;

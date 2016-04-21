@@ -1,4 +1,4 @@
-#N canvas 954 135 432 358 10;
+n#N canvas 954 135 432 358 10;
 #X obj 158 -62 sigToGate;
 #X obj 158 39 +;
 #X floatatom 188 39 5 0 0 0 - - -;
@@ -25,7 +25,7 @@
 #X obj 361 170 mod 8;
 #X obj 158 -33 sel 1;
 #X msg 158 -6 1;
-#X obj 226 -63 loadbang;
+#X obj 226 -63 initbang;
 #X msg 188 4 0;
 #X obj 159 -100 inlet~;
 #X connect 0 0 24 0;

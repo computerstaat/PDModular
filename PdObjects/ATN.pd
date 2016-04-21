@@ -4,7 +4,7 @@
 #X floatatom 32 145 5 0 0 0 - - -;
 #X obj 17 44 inlet~;
 #X obj 480 220;
-#X obj 185 70 loadbang;
+#X obj 185 70 initbang;
 #X obj 17 168 *~;
 #X obj 74 72 routeOSC /ATN;
 #X obj 74 100 routeOSC /amount;
