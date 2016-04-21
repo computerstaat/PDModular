@@ -1,4 +1,4 @@
-#N canvas 1218 23 445 314 10;
+#N canvas 1216 29 445 314 10;
 #X text 155 -56 ENV;
 #X text 101 -55 INPUT;
 #X msg 359 47 0.5;
@@ -29,4 +29,4 @@
 #X connect 12 0 14 0;
 #X connect 13 0 6 1;
 #X connect 14 0 8 1;
-#X coords 0 924 1 923 30 17 1 100 100;
+#X coords 0 314 1 313 30 17 0;

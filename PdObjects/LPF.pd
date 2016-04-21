@@ -1,4 +1,4 @@
-#N canvas 200 32 522 423 10;
+#N canvas 204 90 522 423 10;
 #X declare -lib mrpeach;
 #X obj 72 45 inlet~;
 #X obj 225 16 inlet;
@@ -7,11 +7,11 @@
 #X floatatom 335 74 5 0 0 0 - - -;
 #X obj 225 71 routeOSC /cut;
 #X obj 335 44 routeOSC /res;
-#X obj 18 225 moog~;
+#X obj 54 262 moog~;
 #X obj 335 106 * 3;
 #X obj 335 140 + 1;
 #X obj 225 127 * 8000;
-#X obj 18 259 outlet~;
+#X obj 54 296 outlet~;
 #X obj 29 45 inlet~;
 #X floatatom 123 73 5 0 0 0 - - -;
 #X obj 122 45 routeOSC /vcamnt;
@@ -22,19 +22,21 @@
 #X msg 121 15 0.5;
 #X msg 80 16 0;
 #X obj 225 44 routeOSC /LPF;
-#X connect 0 0 11 0;
+#X obj 54 229 max~ 0;
+#X connect 0 0 7 0;
 #X connect 1 0 21 0;
 #X connect 2 0 10 0;
 #X connect 4 0 8 0;
 #X connect 5 0 2 0;
 #X connect 6 0 4 0;
+#X connect 7 0 11 0;
 #X connect 8 0 9 0;
 #X connect 9 0 7 2;
 #X connect 10 0 15 1;
 #X connect 12 0 17 0;
 #X connect 13 0 16 0;
 #X connect 14 0 13 0;
-#X connect 15 0 7 1;
+#X connect 15 0 22 0;
 #X connect 16 0 17 1;
 #X connect 17 0 15 0;
 #X connect 18 0 19 0;
@@ -46,3 +48,4 @@
 #X connect 21 0 5 0;
 #X connect 21 0 6 0;
 #X connect 21 0 14 0;
+#X connect 22 0 7 1;
