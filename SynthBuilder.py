@@ -184,6 +184,39 @@ class Application (tk.Frame):
     self.PureData.pd.kill()
     os.system ("kill -9 " + str(pid))
 
+  def Save(self):
+    self.savePopup = tk.Tk()
+    self.savePopup.wm_title("Save")
+    label = tk.Label(self.savePopup, text="Please Name Synthesizer:", font="Purisa")
+    label.pack(side="top", fill="x", pady=10)
+    self.e = Entry(self.savePopup)
+    self.e.insert(0, "name")
+    self.e.pack()
+    B1 = tk.Button(self.savePopup, text="Save", command =self.SaveEntered)
+    B1.pack()
+    self.savePopup.mainloop()
+
+  def SaveEntered(self):
+      name = self.e.get()
+      self.savePopup.destroy()
+      presets = {}
+      midicc = {}
+      for module in self.AllModules:
+        m = module.getMidiCC()
+        midicc.update(m)
+        p = module.getPresets()
+        presets.update(p)
+
+      pfile = open("./Patches/" + name + ".presets", 'w+')
+      for k,v in presets.iteritems():
+        pfile.write(k + ";" + str(v)+ "\n")
+      pfile.close()
+      mfile = open("./Patches/" + name + ".midicc", 'w+')
+      for k,v in midicc.iteritems():
+        mfile.write(str(k) + ";" + v + "\n")
+      mfile.close()
+      self.PureData.pd.save(name)
+
   def saveEmAll(self, name):
     patchFile = open('./patches/' + name + ".py", 'w+')
     modules = {}
@@ -218,7 +251,7 @@ class Application (tk.Frame):
 
     menu = Menu(self.menubar, tearoff=0)
     self.menubar.add_cascade(label="File", menu=menu)
-    menu.add_command(label="Save", command=self.PureData.pd.save)
+    menu.add_command(label="Save", command=self.Save)
     menu.add_command(label="New")
     menu.add_command(label="Exit", command=self.killEmAll)
 

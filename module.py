@@ -34,6 +34,26 @@ class Module():
       oscmsg.append(values)
       self.osc.send(oscmsg)
 
+  def getPresets(self):
+      presets = {}
+      for element in self.elements:
+        if isinstance(element, Slider):
+          address = "/" + self.tag +"/" + self.name + "/" + element.name
+          presets[address] = element.value
+      return presets
+
+  def getMidiCC(self):
+      presets = {}
+      for element in self.elements:
+        if isinstance(element, Slider):
+          if element.cc != None:
+            address = "/" + self.tag +"/" + self.name + "/" + element.name
+            presets[element.cc] = address
+      return presets
+
+
+
+
   def reCenter(self):
     for element in self.elements:
       if isinstance(element,Jack):
@@ -159,12 +179,6 @@ class Module():
             #   print "FAILURE!!!!!"
             # self.canvas.coords(cable2, jack1x - cordoffset, jack1y + cordoffset, midpointx - cordoffset,\
             #                    midpointy + cordoffset, jack2x - cordoffset, jack2y + cordoffset)
-
-
-
-
-
-
       self.pressedX = event.x
       self.pressedY = event.y
 

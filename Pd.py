@@ -11,7 +11,7 @@ from subprocess import *
 PORT=8666
 IP="127.0.0.1"
 LOCATION = "./PdObjects/"
-PUREDATA = "pd-extended"
+PUREDATA = "Pd-extended"
 
 
 
@@ -89,13 +89,13 @@ class PD():
 
 	def systemCall(self, msg):
 		#print "MESAGE IS " + msg
-		os.system(" echo %s | pdsend %d" % (msg, PORT))
+		os.system(" echo %s | /Applications/Pd-extended.app/Contents/Resources/bin/pdsend %d" % (msg, PORT))
 		
 	def kill(self):
 
 		os.system("pkill Pd-extended" )
 
-	def save(self):
+	def save(self, name):
 		msg = "pd-new menusaveas \;" 
 		self.systemCall(msg)
 
