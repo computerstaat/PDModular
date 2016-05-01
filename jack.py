@@ -25,7 +25,6 @@ class Jack():
       else:
         color = Presets['OutputJack']
         darkcolor = Presets['OutputJackShadow']
-      self.cableBackground = {}
       self.jackShadow = self.canvas.create_oval(x1+ 2,y1 + 6, x1+2*self.r, y1+2*self.r+ 6, fill=darkcolor, outline=darkcolor,tags=(self.tag, self.jacktag))
       self.jackLoop = self.canvas.create_oval(x1+ 4,y1 + 4, x1+2*self.r + 2, y1+2*self.r + 2, fill=color, outline=color,tags=(self.tag, self.jacktag))
       self.jackID = self.canvas.create_oval(x1+ 6,y1 + 6, x1+2*self.r , y1+2*self.r, fill=Presets['JackHole'], tags=(self.tag, self.jacktag, "Jack"))
@@ -61,7 +60,6 @@ class Jack():
           self.canvas.delete(self.popup)
           self.canvas.delete(self.popuptext)
           self.parent.parent.removeCable(self.currentCable)
-          del self.cableBackground[self.currentCable]
       self.currentCable = None
       self.canvas.delete(self.popup)
       self.canvas.delete(self.popuptext)
@@ -77,12 +75,10 @@ class Jack():
       self.jackCoords = self.canvas.coords(self.jackID)
       self.centerx, self.centery = self.getCenter()
       global cableColor
-      #self.currentConnection2 = self.canvas.create_line(self.centerx - cordoffset, self.centery + cordoffset, \
-      #      event.x - cordoffset, event.y + cordoffset, fill=chooseCableColor.getCurrentColor(), width = 3, tags=(self.tag + "cable"),smooth="true")
+      
       self.currentConnection1 = self.canvas.create_line(self.centerx, self.centery, event.x, event.y, \
             fill=chooseCableColor.getCurrentColor(), width = Presets['CableWidth'], tags=(self.tag + "cable"),smooth=Presets['CableSmooth'])
       self.canvas.addtag_withtag(str(self.currentConnection1) + " cable", self.currentConnection1)
-      #self.canvas.addtag_withtag(str(self.currentConnection2) + " cable", self.currentConnection2)
 
 
     def onRelease(self, event):
@@ -95,10 +91,7 @@ class Jack():
           jack2x, jack2y = newConnection.getCenter()
           midpointx = (jack1x + jack2x) / 2
           midpointy = ((jack1y + jack2y) / 2) + 40
-          #self.canvas.coords(self.currentConnection2, jack1x - cordoffset, jack1y + cordoffset, midpointx - cordoffset,\
-          #                                     midpointy + cordoffset, jack2x + cordoffset, jack2y + cordoffset)
           self.canvas.coords(self.currentConnection1, jack1x, jack1y, midpointx, midpointy, jack2x, jack2y)
-          #self.cableBackground[self.currentConnection1] = self.currentConnection2
 
           bp = self.canvas.tag_bind (str(self.currentConnection1) + " cable", "<ButtonPress-2>", self.popUp)
           br = self.canvas.tag_bind (str(self.currentConnection1) + " cable", "<ButtonRelease-2>", self.unpopUp)
@@ -108,7 +101,6 @@ class Jack():
             self.canvas.delete(br)
           return 
       self.canvas.delete(self.currentConnection1)
-      #self.canvas.delete(self.currentConnection2)
 
       self.currentConnection1 = None
       #self.currentConnection2 = None
@@ -116,10 +108,8 @@ class Jack():
     def onMotion(self, event):
       midpointx = (self.centerx + event.x) / 2
       midpointy = ((self.centery + event.y) / 2) + 40
-      #self.canvas.coords(self.currentConnection2, self.centerx - cordoffset, self.centery + cordoffset, midpointx - cordoffset\
-      #        , midpointy + cordoffset ,event.x - cordoffset, event.y + cordoffset)
+      
       self.canvas.coords(self.currentConnection1, self.centerx, self.centery, midpointx, midpointy,event.x, event.y)
 
-      #item = self.canvas.find_closest(event.x, event.y)[0]
 
 

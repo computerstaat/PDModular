@@ -25,7 +25,7 @@ class PD():
 		#self.connections = {}
 		self.UIDcounter = 1
 		self.curX = 5
-		self.curY = 25
+		self.curY = 35
 		self.objectCount = 1
 
 		#creates module and returns UID
@@ -35,7 +35,7 @@ class PD():
 		curUID = self.UIDcounter
 		self.UIDcounter += 1
 		self.objectCount += 1
-		self.curY += 20
+		self.curY += 30
 		self.systemCall(msg)
 		print self.modules
 		return curUID
