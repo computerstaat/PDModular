@@ -3,6 +3,7 @@ import random
 import Tkinter as tk
 from Tkinter import *
 from ChooseCableColor import chooseCableColor
+from presets import Presets
 
 scalar = 1.0
 cordoffset = 2
@@ -19,18 +20,18 @@ class Jack():
       self.receivers = {}
       self.textID = None
       if type == "Input":
-        color = "yellow"
-        darkcolor = "gold"
+        color = Presets['InputJack']
+        darkcolor = Presets['InputJackShadow']
       else:
-        color = "red"
-        darkcolor = "firebrick"
+        color = Presets['OutputJack']
+        darkcolor = Presets['OutputJackShadow']
       self.cableBackground = {}
       self.jackShadow = self.canvas.create_oval(x1+ 2,y1 + 6, x1+2*self.r, y1+2*self.r+ 6, fill=darkcolor, outline=darkcolor,tags=(self.tag, self.jacktag))
       self.jackLoop = self.canvas.create_oval(x1+ 4,y1 + 4, x1+2*self.r + 2, y1+2*self.r + 2, fill=color, outline=color,tags=(self.tag, self.jacktag))
-      self.jackID = self.canvas.create_oval(x1+ 6,y1 + 6, x1+2*self.r , y1+2*self.r, fill="black", tags=(self.tag, self.jacktag, "Jack"))
+      self.jackID = self.canvas.create_oval(x1+ 6,y1 + 6, x1+2*self.r , y1+2*self.r, fill=Presets['JackHole'], tags=(self.tag, self.jacktag, "Jack"))
 
       if title != "":
-        self.textID = self.canvas.create_text(self.centerx,y1+self.r*2 + 9 , font=("Purisa", 7, "bold"), text =title, tags=(self.tag, "Module"))
+        self.textID = self.canvas.create_text(self.centerx,y1+self.r*2 + 9 , font=Presets['JackFont'], text=title, tags=(self.tag, "Module"))
 
       self.jackCoords = self.canvas.coords(self.jackID)
       self.bp = canvas.tag_bind (self.jacktag, "<ButtonPress-1>", self.onPress)
@@ -61,6 +62,7 @@ class Jack():
           self.canvas.delete(self.popuptext)
           self.parent.parent.removeCable(self.currentCable)
           del self.cableBackground[self.currentCable]
+      self.currentCable = None
       self.canvas.delete(self.popup)
       self.canvas.delete(self.popuptext)
 
@@ -78,7 +80,7 @@ class Jack():
       #self.currentConnection2 = self.canvas.create_line(self.centerx - cordoffset, self.centery + cordoffset, \
       #      event.x - cordoffset, event.y + cordoffset, fill=chooseCableColor.getCurrentColor(), width = 3, tags=(self.tag + "cable"),smooth="true")
       self.currentConnection1 = self.canvas.create_line(self.centerx, self.centery, event.x, event.y, \
-            fill=chooseCableColor.getCurrentColor(), width = 3, tags=(self.tag + "cable"),smooth="true")
+            fill=chooseCableColor.getCurrentColor(), width = Presets['CableWidth'], tags=(self.tag + "cable"),smooth=Presets['CableSmooth'])
       self.canvas.addtag_withtag(str(self.currentConnection1) + " cable", self.currentConnection1)
       #self.canvas.addtag_withtag(str(self.currentConnection2) + " cable", self.currentConnection2)
 
@@ -100,8 +102,10 @@ class Jack():
 
           bp = self.canvas.tag_bind (str(self.currentConnection1) + " cable", "<ButtonPress-2>", self.popUp)
           br = self.canvas.tag_bind (str(self.currentConnection1) + " cable", "<ButtonRelease-2>", self.unpopUp)
-          self.parent.parent.addCable(self.currentConnection1, self, newConnection, bp, br)
-
+          if self.parent.parent.addCable(self.currentConnection1, self, newConnection, bp, br) == False:
+            self.canvas.delete(self.currentConnection1)
+            self.canvas.delete(bp)
+            self.canvas.delete(br)
           return 
       self.canvas.delete(self.currentConnection1)
       #self.canvas.delete(self.currentConnection2)

@@ -2,6 +2,7 @@ import sys, os, string, time, copy
 import random
 import Tkinter as tk
 from Tkinter import *
+from presets import Presets
 
 scalar = 1.0
 
@@ -27,22 +28,23 @@ class Slider():
 
       for y in range(10):
         self.marks.append(canvas.create_rectangle(x1,y1 +(y*10 * scalar) + 5, x1+5 * scalar, y1 + (y*10 * scalar) + 7, \
-          fill="lightslategrey", outline="lightslategrey", tags=(self.tag, "Module", self.wholeSliderTag)))
+          fill=Presets['SliderTick'], outline=Presets['SliderTick'], tags=(self.tag, "Module", self.wholeSliderTag)))
         self.marks.append(canvas.create_rectangle(x1+ 15,y1 +(y*10 * scalar) + 5, x1+20 * scalar, y1 + (y*10 * scalar) + 7, \
-          fill="lightslategrey", outline="lightslategrey", tags=(self.tag, "Module", self.wholeSliderTag)))
+          fill=Presets['SliderTick'], outline=Presets['SliderTick'], tags=(self.tag, "Module", self.wholeSliderTag)))
      
       self.containerID = canvas.create_rectangle(x1+10,y1+ 2, x1 + 11 * scalar, y1 + 98 * scalar, \
-          fill="black", tags=(self.tag, "Module", self.wholeSliderTag))
-
+          fill=Presets['SliderLine'], tags=(self.tag, "Module", self.wholeSliderTag))
 
       self.sliderIDdark = canvas.create_rectangle(x1+4,y1+46, x1 + 17 * scalar, y1 + 55 * scalar, \
-            tags=(self.tag, self.slidertag), fill="royalblue", outline="royalblue")
-      self.sliderID = canvas.create_rectangle(x1+6,y1+45, x1 + 18 * scalar, y1 + 53 * scalar, \
-            tags=(self.tag, self.slidertag), fill="deepskyblue", outline="deepskyblue")
-      self.sliderIDnotch = self.canvas.create_line(x1+6,y1+50, x1 + 18 * scalar, y1 + 50 * scalar, \
-            tags=(self.tag, self.slidertag), fill="white",width = 2)
+            tags=(self.tag, self.slidertag), fill=Presets['SliderShadow'], outline=Presets['SliderShadow'])
 
-      self.textID = canvas.create_text(x1+10 * scalar, y1+110 * scalar, font=("Purisa", 7, "bold"), text =title, tags=(self.tag, "Module"))
+      self.sliderID = canvas.create_rectangle(x1+6,y1+45, x1 + 18 * scalar, y1 + 53 * scalar, \
+            tags=(self.tag, self.slidertag), fill=Presets['Slider'], outline=Presets['Slider'])
+
+      self.sliderIDnotch = self.canvas.create_line(x1+6,y1+50, x1 + 18 * scalar, y1 + 50 * scalar, \
+            tags=(self.tag, self.slidertag), fill=Presets['SliderNotch'],width = 2)
+
+      self.textID = canvas.create_text(x1+10 * scalar, y1+110 * scalar, font=Presets['SliderFont'], text=title, tags=(self.tag, "Module"))
       self.containerCoords = canvas.coords(self.containerID)
       self.sliderCoords = canvas.coords(self.sliderID)
 
@@ -54,6 +56,11 @@ class Slider():
       rbr = self.canvas.tag_bind (self.slidertag, "<ButtonRelease-2>", self.unpopUp)
       #canvas.tag_bind ("Slider", "<B1-Motion>", self.enter)
 
+    def updateValue(self,value):
+      self.value = value
+      #code here to move slider location
+
+      
     def onPress(self, event):
       self.parent.shouldMove(False)
       self.sliderCoords = self.canvas.coords(self.sliderID)

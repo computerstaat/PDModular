@@ -4,6 +4,7 @@ import Tkinter as tk
 from Tkinter import *
 from slider import Slider
 from jack import Jack
+from knob import Knob
 from module import Module
 from ChooseCableColor import chooseCableColor
 # from ChooseModules import chooseModules
@@ -11,10 +12,11 @@ from modules import modules
 from pythonosc import *
 from Pd import *
 import mido
+import json
 
 import OSC
 
-PORT=9001
+PORT=8668
 IP="127.0.0.1"
 
 SizeScaler = 1.0
@@ -27,57 +29,43 @@ class PureData():
   def __init__(self):
     self.pd = PD()
     sleep(5)
-    self.mp = self.pd.create("import mrpeach")
-    self.rec = self.pd.create("udpreceive 9001")
-    self.osc = self.pd.create("unpackOSC")
-    self.pd.connect(self.rec, 0, self.osc, 0)
+    self.osc = 0
+    #self.osc = self.pd.create("inlet")
+    # self.rec = self.pd.create("udpreceive " + str(PORT))
+    # self.osc = self.pd.create("unpackOSC")
+    # self.pd.connect(self.rec, 0, self.osc, 0)
+
+  def reset(self):
+    self.pd.clear()
+    #self.osc = self.pd.create("inlet")
+    # self.rec = self.pd.create("udpreceive " + str(PORT))
+    # self.osc = self.pd.create("unpackOSC")
+    # self.pd.connect(self.rec, 0, self.osc, 0)
+
+  def kill(self):
+    self.pd.kill()
 
 
   def addModule(self, name, uniqueName):
-    if name == "MIDI":
-      uid = self.pd.create(name)
-      self.pd.connect(self.osc, 0, uid, 0)
-      x = 0
-      senders = []
-
+      needsRouter = False
       if uniqueName != None:
+        x = 0
         for column in modules[name]:
           if column[0] == "List":
-            for element in column[1]:
-              if element[0] == "Output":
-                jid = self.pd.create("send~ " + uniqueName + str(x))
-                senders.append(jid)
-                self.pd.connect(uid,x,jid,0)
-                x += 1
-      return uid, senders, None
-    if name == "OUT":
-      uid = self.pd.create(name)
-      return uid, [], None
-    else: 
-      router = self.pd.create("routeOSC /" + uniqueName)
-      uid = self.pd.create(name)
-      x = 0
-      senders = []
-      for column in modules[name]:
-        if column[0] == "List":
-            for element in column[1]:
-              if element[0] == "Input":
-                x += 1
-      self.pd.connect(router, 0, uid, x)
-      self.pd.connect(self.osc, 0, router, 0)
-      x = 0
-      if uniqueName != None:
-        for column in modules[name]:
-          if column[0] == "List":
-            for element in column[1]:
-              if element[0] == "Output":
-                jid = self.pd.create("send~ " + uniqueName + str(x))
-                senders.append(jid)
-                self.pd.connect(uid,x,jid,0)
-                x += 1
-      return uid, senders, router
-
-
+              for element in column[1]:
+                if element[0] == "Input":
+                  x += 1
+          if column[0] == "Slider":
+            needsRouter = True
+      if needsRouter == True:
+            router = self.pd.create("routeOSC /" + uniqueName)
+            uid = self.pd.create(name)
+            self.pd.connect(self.osc, 0, router, 0)
+            self.pd.connect(router, 0, uid, x)
+      else :
+        uid = self.pd.create(name)
+        router = None
+      return uid, router
 
   def removeModule(self, name):
     if name == None:
@@ -87,49 +75,43 @@ class PureData():
 
   def connect(self, jack1, jack2):
     if jack1.parent.isInputJack(jack1) and jack2.parent.isOutputJack(jack2):
-      inputJack = jack1
+      inputID = jack1.parent.pdID
       inputNum = jack1.parent.getJackNum(jack1)
-      outputName = jack2.tag
+      outputID = jack2.parent.pdID
       outputNum = jack2.parent.getJackNum(jack2)
       print "THIS WAY"
     elif jack2.parent.isInputJack(jack2) and jack1.parent.isOutputJack(jack1):
-      inputJack = jack2
+      inputID = jack2.parent.pdID
       inputNum = jack2.parent.getJackNum(jack2)
-      outputName = jack1.tag
+      outputID = jack1.parent.pdID
       outputNum = jack1.parent.getJackNum(jack1)
       print "THAT WAY"
     else:
       print "ILLEGAL CONNECTION"
-      return None
-    name = outputName + str(outputNum)
-    receiver = self.pd.create("receive~ " + name)
-    inputJack.receivers[name] = receiver
-    self.pd.connect(receiver, 0, inputJack.parent.pdID, inputNum)
-    return
-
+      return False
+    print "CONNECTING %d %d" % (inputNum, outputNum)
+    self.pd.connect(outputID, outputNum, inputID, inputNum)
+    return True
 
   def disconnect(self, jack1, jack2):
-    if jack1.parent.isInputJack(jack1) and jack2.parent.isOutputJack(jack2):
-      inputJack = jack1
-      inputNum = jack1.parent.getJackNum(jack1)
-      outputName = jack2.tag
-      outputNum = jack2.parent.getJackNum(jack2)
-      print "THIS WAY"
-    elif jack2.parent.isInputJack(jack2) and jack1.parent.isOutputJack(jack1):
-      inputJack = jack2
-      inputNum = jack2.parent.getJackNum(jack2)
-      outputName = jack1.tag
-      outputNum = jack1.parent.getJackNum(jack1)
-      print "THAT WAY"
-    else:
-      print "ILLEGAL CONNECTION"
-      return None
-    name = outputName + str(outputNum)
-    receiver = inputJack.receivers.pop(name, -1)
-    print "RECEIVER = " + str(receiver)
-    if(receiver == -1):
-      return
-    self.pd.remove(receiver)
+      if jack1.parent.isInputJack(jack1) and jack2.parent.isOutputJack(jack2):
+        inputID = jack1.parent.pdID
+        inputNum = jack1.parent.getJackNum(jack1)
+        outputID = jack2.parent.pdID
+        outputNum = jack2.parent.getJackNum(jack2)
+        print "THIS WAY"
+      elif jack2.parent.isInputJack(jack2) and jack1.parent.isOutputJack(jack1):
+        inputID = jack2.parent.pdID
+        inputNum = jack2.parent.getJackNum(jack2)
+        outputID = jack1.parent.pdID
+        outputNum = jack1.parent.getJackNum(jack1)
+        print "THAT WAY"
+      else:
+        print "ILLEGAL CONNECTION"
+        return False
+      self.pd.disconnect(outputID, outputNum, inputID, inputNum)
+      return True
+
 
 class Application (tk.Frame):
 
@@ -165,9 +147,11 @@ class Application (tk.Frame):
     print "JACK1 = " + str(jack1)
     print "JACK2 = " + str(jack2)
     print self
-    self.PureData.connect(jack1, jack2)
+    if self.PureData.connect(jack1, jack2) == False:
+      return False
     self.Cables.append((cable, jack1, jack2, bp, br))
-    print self.Cables
+    return True
+
 
   def cablesToFront(self):
     for cable, _, _, _, _ in self.Cables:
@@ -180,6 +164,7 @@ class Application (tk.Frame):
     return False
 
   def killEmAll(self):
+    self.osc.close()
     pid = os.getpid()
     self.PureData.pd.kill()
     os.system ("kill -9 " + str(pid))
@@ -192,48 +177,112 @@ class Application (tk.Frame):
     self.e = Entry(self.savePopup)
     self.e.insert(0, "name")
     self.e.pack()
-    B1 = tk.Button(self.savePopup, text="Save", command =self.SaveEntered)
+    B1 = tk.Button(self.savePopup, text="Enter", command =self.SaveEntered)
     B1.pack()
     self.savePopup.mainloop()
+
+  def Load(self):
+    self.loadPopup = tk.Tk()
+    self.loadPopup.wm_title("Save")
+    label = tk.Label(self.loadPopup, text="Please Name Synthesizer:", font="Purisa")
+    label.pack(side="top", fill="x", pady=10)
+    self.e = Entry(self.loadPopup)
+    self.e.insert(0, "name")
+    self.e.pack()
+    B1 = tk.Button(self.loadPopup, text="Enter", command =self.LoadEntered)
+    B1.pack()
+    self.loadPopup.mainloop()
+
+  def LoadEntered(self):
+      name = self.e.get()
+      self.loadPopup.destroy()
+      with open("./Patches/patches.json",'r') as json_file:
+        patchDictionary = json.load(json_file)
+        for m in self.AllModules:
+          m.delete()
+        self.PureData.reset()
+        patch = patchDictionary[name]
+        for n, module in patch['modules'].iteritems():
+          newM = Module(self.canvas, module['Name'], module['x'], module['y'], self, self.osc)
+          newM.setValues(module['Values'])
+          tempDict[n] = newM
+          self.AllModules.append(newM)
+        for cable in patch['cables']:
+          print cable
 
   def SaveEntered(self):
       name = self.e.get()
       self.savePopup.destroy()
-      presets = {}
-      midicc = {}
-      for module in self.AllModules:
-        m = module.getMidiCC()
-        midicc.update(m)
-        p = module.getPresets()
-        presets.update(p)
+      patchDictionary = {}
+      with open("./Patches/patches.json",'r') as json_file:
+        patchDictionary = json.load(json_file)
+        mods = {}
+        cabs = {}
+        presets = {}
+        midi = {}
+        for module in self.AllModules:
+          mods.update(module.getRepresentation())
+          midi.update(module.getMidiCC())
+          presets.update(module.getPresets())
+        x = 0
+        for _, j1, j2, _, _  in self.Cables:
+          if j1 in j1.parent.InputJacks:
+            cabs[x] = [j1.parent.tag, j1.parent.getJackNum(j1), 
+                           j2.parent.tag, j2.parent.getJackNum(j2)]
+          elif j2 in j2.parent.InputJacks:
+            cabs[x] = [j2.parent.tag, j2.parent.getJackNum(j2), 
+                           j1.parent.tag, j1.parent.getJackNum(j1)]
+          x += 1
+        patch = {name:  { 'cables' : cabs, 'modules' : mods, 'presets' : presets, 'midi': midi}}
+        patchDictionary.update(patch)
+      with open("./Patches/patches.json",'w') as json_file:
+        json.dump(patchDictionary, json_file, indent=4, sort_keys=True, separators=(',', ':'))
+        self.PureData.pd.save(name)
 
-      pfile = open("./Patches/" + name + ".presets", 'w+')
-      for k,v in presets.iteritems():
-        pfile.write(k + ";" + str(v)+ "\n")
-      pfile.close()
-      mfile = open("./Patches/" + name + ".midicc", 'w+')
-      for k,v in midicc.iteritems():
-        mfile.write(str(k) + ";" + v + "\n")
-      mfile.close()
-      self.PureData.pd.save(name)
 
-  def saveEmAll(self, name):
-    patchFile = open('./patches/' + name + ".py", 'w+')
-    modules = {}
-    cables = {}
-    x = 0
-    for module in self.AllModules:
-      modules[x] = module.getRepresentation()
-      x += 1
-    x = 0
-    for cable in self.Cables:
-      cables[x] = cable.getRepresentation()
-      x += 1
-    patchFile.write(modules)
-    patchFile.write(cables)
+  # def saveEmAll(self, name):
+  #   patchDictionary = {}
+  #   with open("./Patches/patches.json",'r') as json_file:
+  #     patchDictionary = json.load(json_file)
+  #     mods = {}
+  #     cabs = {}
+      
+  #     for module in self.AllModules:
+  #       mods.update(module.getRepresentation())
+  #     for _, j1, j2, _, _  in self.Cables:
+  #       if j1 in j1.parent.InputJacks:
+  #         cabs[x] = [j1.parent.tag, j1.parent.getJackNum(j1), 
+  #                        j2.parent.tag, j2.parent.getJackNum(j2)]
+  #       elif j2 in j2.parent.InputJacks:
+  #         cabs[x] = [j2.parent.tag, j2.parent.getJackNum(j2), 
+  #                        j1.parent.tag, j1.parent.getJackNum(j1)]
+  #       x += 1
+  #     patch = {name:  { 'cables' : cabs, 'modules' : mods}}
+  #     patchDictionary.update(patch)
+  #   with open("./Patches/patches.json",'w') as json_file:
+  # #     json.dump(patchDictionary, json_file, indent=4, sort_keys=True, separators=(',', ':'))
 
-  def loadEmAll(self, name):
-    patchFile = open('./patches/' + name + ".py", 'r')
+
+  #   def loadEmAll(self, name):
+  #     with open("./Patches/patches.json",'r') as json_file:
+  #       patchDictionary = json.load(json_file)
+  #       for m in self.AllModules:
+  #         m.delete()
+  #       self.PureData.kill()
+  #       self.PureData = PureaData()
+  #       patch = patchDictionary[name]
+  #       for n, module in patch['modules'].iteritems():
+  #         newM = Module(self.canvas, module['Name'], module['x'], module['Y'], self, self.osc)
+  #         newM.setValues(module['Values'])
+  #         tempDict[n] = newM
+  #         self.AllModules.append(newM)
+  #       for cable in patch['cables']:
+  #         print cable
+
+
+
+
+
 
   
   def __init__ (self, master):
@@ -252,6 +301,7 @@ class Application (tk.Frame):
     menu = Menu(self.menubar, tearoff=0)
     self.menubar.add_cascade(label="File", menu=menu)
     menu.add_command(label="Save", command=self.Save)
+    menu.add_command(label="Load", command=self.Load)
     menu.add_command(label="New")
     menu.add_command(label="Exit", command=self.killEmAll)
 
@@ -264,8 +314,6 @@ class Application (tk.Frame):
     self.menubar.add_cascade(label="Cable Color", menu=menu)
     for color in chooseCableColor.getAllColors():
       menu.add_command(label=color, command=(lambda color :lambda :chooseCableColor.setCurrentColor(color))(color))
-
-
 
     self.canvas =tk.Canvas (self, width =CanvasWidth, height =CanvasHeight,
       relief =tk.RIDGE, background ="white", borderwidth =1)

@@ -4,6 +4,7 @@ import Tkinter as tk
 from Tkinter import *
 from modules import modules
 from jack import Jack
+from knob import Knob
 from slider import Slider
 import OSC
 
@@ -16,11 +17,11 @@ class Module():
   def __init__(self, canvas, name, x1, y1, parent, osc):
     self.name = name
     self.tag = "M" + str(id(self))
-    self.pdID, self.senders, self.oscRouter = parent.PureData.addModule(name, self.tag)
+    self.pdID, self.oscRouter = parent.PureData.addModule(name, self.tag)
     self.canvas = canvas
-    self.elements = []
     self.InputJacks = []
     self.OutputJacks = []
+    self.Sliders = []
     self.buildModule(name, x1, y1)
     self.canMove = True
     self.parent = parent
@@ -34,37 +35,48 @@ class Module():
       oscmsg.append(values)
       self.osc.send(oscmsg)
 
+  def setValues(self, values):
+      x = 0
+      for v,s in zip(values, self.Sliders):
+        s.updateValue(v)
+
   def getPresets(self):
       presets = {}
-      for element in self.elements:
-        if isinstance(element, Slider):
-          address = "/" + self.tag +"/" + self.name + "/" + element.name
-          presets[address] = element.value
+      for slider in self.Sliders:
+          address = "/" + self.tag +"/" + self.name + "/" + slider.name
+          presets[address] = slider.value
       return presets
 
   def getMidiCC(self):
       presets = {}
-      for element in self.elements:
-        if isinstance(element, Slider):
-          if element.cc != None:
-            address = "/" + self.tag +"/" + self.name + "/" + element.name
-            presets[element.cc] = address
+      for slider in self.Sliders:
+        if slider.cc != None:
+          address = "/" + self.tag +"/" + self.name + "/" + slider.name
+          presets[slider.cc] = address
       return presets
 
-
+  def getRepresentation(self):
+    coords = self.canvas.coords(self.module)
+    rep = {}
+    rep['Name'] = self.name
+    rep['x'] = coords[0]
+    rep['y'] = coords[1]
+    sliders = []
+    for slider in self.Sliders:
+        sliders.append(slider.value)
+    rep['Values'] = sliders
+    return {self.tag : rep}
 
 
   def reCenter(self):
-    for element in self.elements:
-      if isinstance(element,Jack):
-        element.getCenter()
+    for jack in self.InputJacks + self.OutputJacks:
+        jack.getCenter()
 
   def findLocalJack(self, jackID):
-    for element in self.elements:
-      if isinstance(element,Jack):
-        if element.jackID == jackID:
-          return element
-    return 
+    for jack in self.InputJacks + self.OutputJacks:
+        if jack.jackID == jackID:
+          return jack
+    return
 
   def findGlobalJack(self, jackID):
     return self.parent.findJack(jackID)
@@ -83,16 +95,16 @@ class Module():
     return jack in self.OutputJacks
 
   def delete(self):
+    print "DELETING" 
     toRemove = list()
     for cable, jack1, jack2, _ , _ in self.parent.Cables:
-      if jack1 in self.elements or jack2 in self.elements:
+      if jack1 in self.InputJacks + self.OutputJacks or jack2 in self.InputJacks + self.OutputJacks:
         toRemove.append(cable)
     for cable in toRemove:
-        self.parent.removeCable(cable)
-    for element in self.elements:
+      self.parent.removeCable(cable)
+    for element in self.InputJacks + self.OutputJacks + self.Sliders:
       element.delete()
-    for sender in self.senders:
-      self.parent.PureData.removeModule(sender)    
+    self.parent.AllModules.remove(self)  
     self.parent.PureData.removeModule(self.oscRouter)
     self.parent.PureData.removeModule(self.pdID)
     self.canvas.delete(self.module)
@@ -106,15 +118,15 @@ class Module():
     
     for element in elements:
       if element[0] == "Input":
-        newJack = Jack(self.canvas, x1, current, self.tag, element[1], self, element[0])
-        self.elements.append(newJack)
-        self.InputJacks.append(newJack)
-      if element[0] == "Output":
-        newJack = Jack(self.canvas, x1, current, self.tag, element[1], self, element[0])
-        self.elements.append(newJack)
-        self.OutputJacks.append(newJack)
-
-      if element[0] == "Text":
+        self.InputJacks.append( 
+          Jack(self.canvas, x1, current, self.tag, element[1], self, element[0]))
+      elif element[0] == "Output":
+        self.OutputJacks.append( 
+          Jack(self.canvas, x1, current, self.tag, element[1], self, element[0]))
+      elif element[0] == "Knob":
+        self.Knobs.append( 
+          Knob(self.canvas, x1, current, self.tag, element[2], element[1], self))
+      elif element[0] == "Text":
         self.canvas.create_text(x1+10 * scalar, current + (distance / 4), font=("Purisa", 8), text =element[1], tags=(self.tag, "Module"))
       current += distance
 
@@ -129,7 +141,8 @@ class Module():
       if segment[0] == "List":
         self.buildColumn(current, y1, segment[1])
       elif segment[0] == "Slider":
-        self.elements.append(Slider(self.canvas, current, y1 + (10 * scalar), self.tag, segment[2], segment[1], self))
+        newSlider = Slider(self.canvas, current, y1 + (10 * scalar), self.tag, segment[2], segment[1], self)
+        self.Sliders.append(newSlider)
       else:
         print "This is not a valid module"
       current += 30 * scalar
@@ -164,21 +177,13 @@ class Module():
       self.canvas.tag_raise(self.tag)
       self.canvas.move(self.tag, event.x - self.pressedX, event.y - self.pressedY)
       for cable, jack1, jack2, bp, br in self.parent.Cables:
-        if jack1 in self.elements or jack2 in self.elements:
+        if jack1 in self.InputJacks + self.OutputJacks or jack2 in self.InputJacks + self.OutputJacks:
             jack1x, jack1y = jack1.getCenter()
             jack2x, jack2y = jack2.getCenter()
             midpointx = (jack1x + jack2x) / 2
             midpointy = ((jack1y + jack2y) / 2) + 40
             self.parent.cablesToFront()
             self.canvas.coords(cable, jack1x, jack1y, midpointx, midpointy, jack2x, jack2y)
-            # if cable in jack1.cableBackground.keys():
-            #   cable2 = jack1.cableBackground[cable]
-            # elif cable in jack2.cableBackground.keys():
-            #   cable2 = jack2.cableBackground[cable]
-            # else: 
-            #   print "FAILURE!!!!!"
-            # self.canvas.coords(cable2, jack1x - cordoffset, jack1y + cordoffset, midpointx - cordoffset,\
-            #                    midpointy + cordoffset, jack2x - cordoffset, jack2y + cordoffset)
       self.pressedX = event.x
       self.pressedY = event.y
 

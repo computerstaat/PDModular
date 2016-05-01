@@ -25,6 +25,9 @@ modules = {"VCO":[
     ["List", [["Input", "CV"]]],
     ["List", [["Output", "LP"],["Output", "HP"],["Output", "BP"],["Output", "NP"]]]
   ],
+  "KNOBY": [
+    ["List", [["Knob", "FREQ", "frequency"], ["Input", "DEATH"], ["Knob","AMNT", "amout"]]]
+  ],
   "SLOPE":[
     ["Slider", "RISE", "rise"],
     ["Slider", "FALL", "fall"],
@@ -32,9 +35,16 @@ modules = {"VCO":[
     ["List", [["Input", "1V/O"],["Input", "VC"],["Input", "TRIG"],["Input", "INPUT"]]],
     ["List", [["Output", "GATE"],["Output", "OUT"]]],
   ],
+  "SAMPLE":[
+    ["List", [["Input", "IN"],["Input", "GATE"],["Output", "OUT"]]],
+  ],
   "SINE":[
     ["Slider", "FREQ", "freq"],
     ["List", [["Input", "1V/O"],["Output", "OUT"]]],
+  ],
+  "CLOCK":[
+    ["Slider", "SPEED", "speed"],
+    ["List", [["Output", "OUT"]]],
   ],
   "LPF":[
     ["Slider", "FREQ", "cut"],
@@ -55,6 +65,10 @@ modules = {"VCO":[
     ["Slider", "AMNT", "amount"],
     ["List", [["Input", "IN"],["Output", "OUT"]]],
   ],
+  "BI-ATN":[
+    ["Slider", "AMNT", "amount"],
+    ["List", [["Input", "IN"],["Output", "OUT"]]],
+  ],
   "SQR":[
     ["Slider", "FREQ", "freq"],
     ["Slider", "FREQ", "width"],
@@ -62,7 +76,7 @@ modules = {"VCO":[
   ],
   "SLFO":[
     ["Slider", "FREQ", "freq"],
-    ["List", [["Output", "OUT"]]],
+    ["List", [["Inlet", "RESET"],["Output", "OUT"]]],
   ],
   "MLFO":[
     ["Slider", "FREQ", "freq"],
@@ -103,6 +117,7 @@ modules = {"VCO":[
     ["List", [["Output", "/5"],["Output", "/6"],["Output", "/7"],["Output", "/8"]]]
   ],
   "NOISE": [
+    ["Slider", "FREQ", "freq"],
     ["List", [["Output", "WHITE"],["Output", "PINK"],["Output", "LOW"]]]
   ],
   "INV": [
@@ -110,7 +125,7 @@ modules = {"VCO":[
   ],
   "LOGIC": [
     ["List", [["Input", "A"],["Input", "B"]]],
-    ["List", [["Output", "AND"],["Output", "OR"],["Output", "NOR"],["Output", "NAND"],["Output", "XOR"]]],
+    ["List", [["Output", "AND"],["Output", "NAND"],["Output", "OR"],["Output", "XOR"],["Output", "NOR"]]],
     ["List", [["Input", "C"],["Output", "NOT C"], ["Input", "D"],["Output", "NOT D"]]],
   ]
 }
