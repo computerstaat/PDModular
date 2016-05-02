@@ -116,6 +116,21 @@ modules = {"VCO":[
     ["List", [["Input", "IN"],["Output", "/2"],["Output", "/3"],["Output", "/4"]]],
     ["List", [["Output", "/5"],["Output", "/6"],["Output", "/7"],["Output", "/8"]]]
   ],
+  "GSEQ": [
+    ["List", [["Input", "IN"],["Input", "RST"],["Output", "1"],["Output", "2"],["Output", "3"]]],
+    ["List", [["Output", "4"],["Output", "4"],["Output", "6"],["Output", "7"],["Output", "8"]]]
+  ],
+  "VSEQ": [
+    ["List", [["Input", "CLOCK"],["Input", "RST"],["Output", "OUT"]]],
+    ["Slider", "1", "1"],
+    ["Slider", "2", "2"],
+    ["Slider", "3", "3"],
+    ["Slider", "4", "4"],
+    ["Slider", "5", "5"],
+    ["Slider", "6", "6"],
+    ["Slider", "7", "7"],
+    ["Slider", "8", "8"]
+  ],
   "NOISE": [
     ["Slider", "FREQ", "freq"],
     ["List", [["Output", "WHITE"],["Output", "PINK"],["Output", "LOW"]]]

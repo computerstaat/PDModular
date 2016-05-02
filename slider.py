@@ -58,6 +58,9 @@ class Slider():
 
     def updateValue(self,value):
       self.value = value
+      self.parent.sendValue(self.value, self.name)
+
+
       #code here to move slider location
 
       

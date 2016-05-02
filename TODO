@@ -1,0 +1,27 @@
+Load:
+	Values sent to module should change slider location
+	Cable connections in load have not been implemented but exist in saved instance
+
+
+Distributed:
+	Testing needs to be done
+	get rsync working by ethernet/wireless ip
+	LCD has index out of bounds bug
+	LCD should use preset file, not list of pd files in file structure
+
+Hardware:
+	Soundcards
+	Case
+
+Documentation:
+	List of python modules needing to be imported
+	List of locations to change when installing in file structure
+
+Cross Platform:
+	center click on Raspbian is right click on mac(non issue when done with development)
+
+Future Work:
+	Mono channel on conductor for all channel processing
+	Snap to grid
+	Zoom (Proper Scaler)
+	Sort Modules into subcatagories

@@ -3,9 +3,12 @@ import random
 import Tkinter as tk
 from Tkinter import *
 from modules import modules
+from ChooseCableColor import chooseCableColor
 from jack import Jack
 from knob import Knob
 from slider import Slider
+from presets import Presets
+
 import OSC
 
 scalar = 1.0
@@ -109,8 +112,11 @@ class Module():
     self.parent.PureData.removeModule(self.pdID)
     self.canvas.delete(self.module)
     self.canvas.delete(self.title)
-    self.canvas.unbind("<ButtonPress-1>", self.bp)
-    self.canvas.unbind("<B1-Motion>", self.bm)
+    try:
+      self.canvas.unbind("<ButtonPress-1>", self.bp)
+      self.canvas.unbind("<B1-Motion>", self.bm)
+    except:
+      print "FAILED TO UNBIND TAGS"
 
   def buildColumn(self, x1, y1, elements):
     distance = (self.height - 10 ) / len(elements)
@@ -169,7 +175,23 @@ class Module():
 
   def onPress(self, event):
     self.pressedX = event.x
-    self.pressedY = event.y  
+    self.pressedY = event.y
+
+  def connectCable(self, jack1, jack2):
+    jack1x, jack1y = jack1.getCenter()
+    jack2x, jack2y = jack2.getCenter()
+    midpointx = (jack1x + jack2x) / 2
+    midpointy = ((jack1y + jack2y) / 2) + 40
+    cable = self.canvas.create_line(jack1x, jack1y, midpointx, midpointy, jack2x, jack2y, \
+            fill=chooseCableColor.getCurrentColor(), width = Presets['CableWidth'], tags=(jack1.tag + "cable"),smooth=Presets['CableSmooth'])
+    bp = self.canvas.tag_bind (jack1.tag + " cable", "<ButtonPress-2>", jack1.popUp)
+    br = self.canvas.tag_bind (jack1.tag + " cable", "<ButtonRelease-2>", jack1.unpopUp)
+    if jack1.parent.parent.addCable(cable, jack1, jack2, bp, br) == False:
+      self.canvas.delete(cable)
+      self.canvas.delete(bp)
+      self.canvas.delete(br)
+    return 
+
 
   def onMotion(self, event):
 

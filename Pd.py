@@ -21,12 +21,11 @@ PUREDATA = "Pd-extended"
 class PD():
 	def __init__(self):
 		os.system("%s  %sserver.pd &" % (PUREDATA, LOCATION))
-		self.modules = {0: ['inlet', 0, 5, 5]}
-		#self.connections = {}
-		self.UIDcounter = 1
+		self.modules = {}
+		self.UIDcounter = 0
 		self.curX = 5
-		self.curY = 35
-		self.objectCount = 1
+		self.curY = 5
+		self.objectCount = 0
 
 		#creates module and returns UID
 	def create(self, name):
@@ -50,6 +49,7 @@ class PD():
 		# self.systemCall(msg)
 
 	def remove(self, modID):
+		print "REMOVING IN PROGRESS"
 		self.objectCount -= 1
 		_,curid,x,y = self.modules[modID]
 		msg = "pd-new editmode 1, mouse %d %d 0 0, mouseup %d %d 0, cut \;" % (max(0,x - 5), max(0,y - 5), x + 400, y + 25)
@@ -59,26 +59,6 @@ class PD():
 			(n, uid, x, y) = self.modules[i]
 			if uid > curid:
 				self.modules[i] = (n, uid - 1, x, y)
-		# for (mod1ID, outputNum, mod2ID, inputNum) in self.connections.keys():
-		# 	if self.getID(mod1ID) == modID or self.getID(mod2ID) == modID:
-		# 		self.disconnect(mod1ID, outputNum, mod2ID, inputNum)
-
-	# def disconnect(self, uid):
-	# 	print "DISCONNECTING " + str(uid)
-	# 	for key in self.connections.keys():
-	# 		if uid == self.connections[keys]:
-	# 			del self.connections[key]
-	# 			self.remove(uid)
-	# 			return
-	# 	print "NOT FOUND IN PD"
-
-	# def disconnect(self, mod1ID, outputNum, mod2ID, inputNum):
-	# 	try:
-	# 		uid = self.connections[(mod1ID, outputNum, mod2ID, inputNum)]
-	# 		del self.connections[(mod1ID, outputNum, mod2ID, inputNum)]
-	# 		self.remove(uid)
-	# 	except (KeyError):
-	# 		print "DISCONNECT PROBLEM"
 
 	def disconnect(self, mod1ID, outputNum, mod2ID, inputNum):
 		id1=self.getID(mod1ID)
@@ -108,6 +88,11 @@ class PD():
 	def clear(self):
 		msg = "pd-new clear \;"
 		self.systemCall(msg)
+		self.modules = {}
+		self.UIDcounter = 0
+		self.curX = 5
+		self.curY = 5
+		self.objectCount = 0
 
 	def save(self, name):
 		msg = "pd-new menusaveas \;" 

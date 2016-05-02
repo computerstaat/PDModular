@@ -29,18 +29,15 @@ class PureData():
   def __init__(self):
     self.pd = PD()
     sleep(5)
-    self.osc = 0
-    #self.osc = self.pd.create("inlet")
-    # self.rec = self.pd.create("udpreceive " + str(PORT))
-    # self.osc = self.pd.create("unpackOSC")
-    # self.pd.connect(self.rec, 0, self.osc, 0)
+    self.udp = self.pd.create("udpreceive 8668")
+    self.osc = self.pd.create("unpackOSC")
+    self.pd.connect(self.udp, 0, self.osc, 0)
 
   def reset(self):
     self.pd.clear()
-    #self.osc = self.pd.create("inlet")
-    # self.rec = self.pd.create("udpreceive " + str(PORT))
-    # self.osc = self.pd.create("unpackOSC")
-    # self.pd.connect(self.rec, 0, self.osc, 0)
+    self.udp = self.pd.create("udpreceive 8668")
+    self.osc = self.pd.create("unpackOSC")
+    self.pd.connect(self.udp, 0, self.osc, 0)
 
   def kill(self):
     self.pd.kill()
@@ -196,19 +193,32 @@ class Application (tk.Frame):
   def LoadEntered(self):
       name = self.e.get()
       self.loadPopup.destroy()
+      tempDict = {}
       with open("./Patches/patches.json",'r') as json_file:
         patchDictionary = json.load(json_file)
+        print "ALL MODULES"
+        print self.AllModules
         for m in self.AllModules:
+          print "DELETING" + str(m.name)
           m.delete()
         self.PureData.reset()
         patch = patchDictionary[name]
+
+        #Load all modules 
         for n, module in patch['modules'].iteritems():
           newM = Module(self.canvas, module['Name'], module['x'], module['y'], self, self.osc)
           newM.setValues(module['Values'])
           tempDict[n] = newM
           self.AllModules.append(newM)
-        for cable in patch['cables']:
+
+        #Load all connections
+        for cable in patch['cables'].values():
           print cable
+          inputModule = tempDict[cable[0]]
+          inputJack = inputModule.InputJacks[cable[1]]
+          outputModule = tempDict[cable[2]]
+          outputJack = outputModule.OutputJacks[cable[3]]
+          inputModule.connectCable(inputJack, outputJack)
 
   def SaveEntered(self):
       name = self.e.get()
@@ -238,51 +248,6 @@ class Application (tk.Frame):
       with open("./Patches/patches.json",'w') as json_file:
         json.dump(patchDictionary, json_file, indent=4, sort_keys=True, separators=(',', ':'))
         self.PureData.pd.save(name)
-
-
-  # def saveEmAll(self, name):
-  #   patchDictionary = {}
-  #   with open("./Patches/patches.json",'r') as json_file:
-  #     patchDictionary = json.load(json_file)
-  #     mods = {}
-  #     cabs = {}
-      
-  #     for module in self.AllModules:
-  #       mods.update(module.getRepresentation())
-  #     for _, j1, j2, _, _  in self.Cables:
-  #       if j1 in j1.parent.InputJacks:
-  #         cabs[x] = [j1.parent.tag, j1.parent.getJackNum(j1), 
-  #                        j2.parent.tag, j2.parent.getJackNum(j2)]
-  #       elif j2 in j2.parent.InputJacks:
-  #         cabs[x] = [j2.parent.tag, j2.parent.getJackNum(j2), 
-  #                        j1.parent.tag, j1.parent.getJackNum(j1)]
-  #       x += 1
-  #     patch = {name:  { 'cables' : cabs, 'modules' : mods}}
-  #     patchDictionary.update(patch)
-  #   with open("./Patches/patches.json",'w') as json_file:
-  # #     json.dump(patchDictionary, json_file, indent=4, sort_keys=True, separators=(',', ':'))
-
-
-  #   def loadEmAll(self, name):
-  #     with open("./Patches/patches.json",'r') as json_file:
-  #       patchDictionary = json.load(json_file)
-  #       for m in self.AllModules:
-  #         m.delete()
-  #       self.PureData.kill()
-  #       self.PureData = PureaData()
-  #       patch = patchDictionary[name]
-  #       for n, module in patch['modules'].iteritems():
-  #         newM = Module(self.canvas, module['Name'], module['x'], module['Y'], self, self.osc)
-  #         newM.setValues(module['Values'])
-  #         tempDict[n] = newM
-  #         self.AllModules.append(newM)
-  #       for cable in patch['cables']:
-  #         print cable
-
-
-
-
-
 
   
   def __init__ (self, master):
