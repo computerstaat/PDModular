@@ -1,5 +1,5 @@
-#N canvas 397 79 460 447 10;
-#X obj 30 242 outlet~;
+#N canvas 657 84 460 447 10;
+#X obj 30 258 outlet~;
 #X obj 147 52 inlet;
 #X floatatom 105 133 5 0 0 0 - - -;
 #X obj 30 52 inlet~;
@@ -11,10 +11,11 @@
 #X msg 258 109 0.5;
 #X obj 30 128 +~ 1;
 #X obj 30 204 -~ 1;
-#X obj 30 90 feedbacker~;
+#X obj 30 98 receive~ \$0-s;
+#X obj 30 78 send~ \$0-s;
 #X connect 1 0 7 0;
 #X connect 2 0 6 1;
-#X connect 3 0 12 0;
+#X connect 3 0 13 0;
 #X connect 5 0 9 0;
 #X connect 6 0 11 0;
 #X connect 7 0 8 0;
