@@ -2,11 +2,13 @@ import sys, os, string, time, copy
 import random
 import Tkinter as tk
 from Tkinter import *
+from PIL import Image, ImageTk
 from slider import Slider
 from jack import Jack
 from knob import Knob
 from module import Module
 from ChooseCableColor import chooseCableColor
+from presets import Presets
 # from ChooseModules import chooseModules
 from modules import modules
 from pythonosc import *
@@ -20,8 +22,10 @@ PORT=8668
 IP="127.0.0.1"
 
 SizeScaler = 1.0
-CanvasWidth = 900
-CanvasHeight = 900
+CanvasWidth = 1000
+CanvasHeight = 1000
+scalar = Presets['scalar']
+moduleHeight = Presets['ModuleHeight'] * scalar
 MIDIDEVICE = "MPKmini2e"
 
 
@@ -41,6 +45,9 @@ class PureData():
 
   def kill(self):
     self.pd.kill()
+
+  
+
 
 
   def addModule(self, name, uniqueName):
@@ -198,15 +205,16 @@ class Application (tk.Frame):
         patchDictionary = json.load(json_file)
         print "ALL MODULES"
         print self.AllModules
-        for m in self.AllModules:
+        while len(self.AllModules) != 0:
+          m = self.AllModules.pop()
           print "DELETING" + str(m.name)
           m.delete()
-        self.PureData.reset()
         patch = patchDictionary[name]
+        self.PureData.reset()
 
         #Load all modules 
         for n, module in patch['modules'].iteritems():
-          newM = Module(self.canvas, module['Name'], module['x'], module['y'], self, self.osc)
+          newM = Module(self.canvas, module['Name'], module['x'] * scalar , module['y'] * scalar, self, self.osc)
           newM.setValues(module['Values'])
           tempDict[n] = newM
           self.AllModules.append(newM)
@@ -219,6 +227,7 @@ class Application (tk.Frame):
           outputModule = tempDict[cable[2]]
           outputJack = outputModule.OutputJacks[cable[3]]
           inputModule.connectCable(inputJack, outputJack)
+
 
   def SaveEntered(self):
       name = self.e.get()
@@ -249,7 +258,28 @@ class Application (tk.Frame):
         json.dump(patchDictionary, json_file, indent=4, sort_keys=True, separators=(',', ':'))
         self.PureData.pd.save(name)
 
-  
+  def buildCase(self):
+    rowNum = 0
+    screwWidth = 10 * scalar
+    sidePanelWidth = 30
+    self.canvas.create_rectangle(0,0,CanvasWidth+ 10, CanvasHeight + 10, fill=Presets['CaseBackground'])
+    while rowNum * moduleHeight < CanvasHeight:
+      self.canvas.create_rectangle(0, moduleHeight * rowNum,CanvasWidth+ 10, moduleHeight * rowNum + 10, fill=Presets['CaseBar'])
+      self.canvas.create_rectangle(0, moduleHeight * (rowNum+1) - 10,CanvasWidth + 10, moduleHeight* (rowNum+1), fill=Presets['CaseBar'])
+      columNum = 0
+      while (columNum - 1) * screwWidth < CanvasWidth:
+        self.canvas.create_oval(columNum * screwWidth + 2, moduleHeight * rowNum + 2 ,columNum*screwWidth+ 10 - 2,moduleHeight * rowNum+ 10 - 2,fill=Presets['CaseScrew'])
+        self.canvas.create_oval(columNum * screwWidth + 2, moduleHeight * (rowNum+1) + 2 - 10 ,columNum*screwWidth+ 10 - 2,moduleHeight * (rowNum+1) - 2,fill=Presets['CaseScrew'])
+        columNum += 1
+      rowNum += 1
+    self.canvas.create_rectangle(0,0,sidePanelWidth, CanvasHeight + 10, fill=Presets['CaseSidePanel'])
+    self.canvas.create_rectangle(CanvasWidth - sidePanelWidth + 10,0,CanvasWidth + 10, CanvasHeight + 10, fill=Presets['CaseSidePanel'])
+
+  def buildKeyboard(self):
+    print "foo"
+
+
+
   def __init__ (self, master):
     self.master =master
     self.PureData = PureData()
@@ -292,7 +322,7 @@ class Application (tk.Frame):
         self.master.tk.call(master, "config", "-menu", self.menubar)
 
     # chooseModules(self.canvas, 10, 10, self)
-
+    self.buildCase()
     self.canvas.pack (expand =1, fill =tk.BOTH)
 
     #mp = self.midiParameter(self.master, self.canvas)

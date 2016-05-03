@@ -25,3 +25,8 @@ Future Work:
 	Snap to grid
 	Zoom (Proper Scaler)
 	Sort Modules into subcatagories
+
+
+
+Bugs:
+cables not moved to front after load when modules moved

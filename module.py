@@ -1,5 +1,6 @@
 import sys, os, string, time, copy
 import random
+from math import floor
 import Tkinter as tk
 from Tkinter import *
 from modules import modules
@@ -11,8 +12,10 @@ from presets import Presets
 
 import OSC
 
-scalar = 1.0
+scalar = Presets['scalar']
 cordoffset = 2
+singleModuleWidth = 30 * scalar
+moduleHeight = Presets['ModuleHeight'] * scalar
 
 
 class Module():
@@ -25,11 +28,13 @@ class Module():
     self.InputJacks = []
     self.OutputJacks = []
     self.Sliders = []
+    self.Knobs = []
     self.buildModule(name, x1, y1)
     self.canMove = True
     self.parent = parent
     self.osc = osc
     self.currentValues = {}
+    self.mapToGrid(None)
 
   def sendValue(self, values, sliderName):
       oscmsg = OSC.OSCMessage()
@@ -107,7 +112,8 @@ class Module():
       self.parent.removeCable(cable)
     for element in self.InputJacks + self.OutputJacks + self.Sliders:
       element.delete()
-    self.parent.AllModules.remove(self)  
+    if self in self.parent.AllModules:
+      self.parent.AllModules.remove(self)  
     self.parent.PureData.removeModule(self.oscRouter)
     self.parent.PureData.removeModule(self.pdID)
     self.canvas.delete(self.module)
@@ -133,16 +139,16 @@ class Module():
         self.Knobs.append( 
           Knob(self.canvas, x1, current, self.tag, element[2], element[1], self))
       elif element[0] == "Text":
-        self.canvas.create_text(x1+10 * scalar, current + (distance / 4), font=("Purisa", 8), text =element[1], tags=(self.tag, "Module"))
+        self.canvas.create_text(x1+10 * scalar, current + (distance / 4),fill=Presets['Text'], font=("Purisa", 8), text =element[1], tags=(self.tag, "Module"))
       current += distance
 
   def buildModule(self, name, x1, y1):
     layout = modules[name]
-    self.width = len(layout) * 30 * scalar + 10
-    self.height = 130 * scalar
-    self.module = self.canvas.create_rectangle(x1,y1,x1+self.width,y1+self.height, tags=(self.tag, "Module"), fill="lightgrey")#, outline="lightgrey")
-    self.title = self.canvas.create_text(x1+(20 * scalar), y1+(5 * scalar), font=("Purisa", 10,"bold"), text =name, tags=(self.tag, "Module"), justify=RIGHT)
-    current = x1+10 * scalar
+    self.width = len(layout) * singleModuleWidth #+ 10
+    self.height = moduleHeight
+    self.module = self.canvas.create_rectangle(x1,y1,x1+self.width,y1+self.height, tags=(self.tag, "Module"), fill=Presets['Module'])#, outline="lightgrey")
+    self.title = self.canvas.create_text(x1+(20 * scalar), y1+(5 * scalar), font=("Purisa", 10,"bold"),fill=Presets['Text'], text =name, tags=(self.tag, "Module"), justify=LEFT)
+    current = x1 + 5 * scalar
     for segment in layout:
       if segment[0] == "List":
         self.buildColumn(current, y1, segment[1])
@@ -156,13 +162,14 @@ class Module():
 
     self.bp = self.canvas.tag_bind (self.tag, "<ButtonPress-1>", self.onPress)
     self.bm = self.canvas.tag_bind (self.tag, "<B1-Motion>", self.onMotion)
+    self.br = self.canvas.tag_bind (self.tag, "<ButtonRelease-1>", self.mapToGrid)
     self.rc = self.canvas.tag_bind (self.tag, "<ButtonPress-2>", self.popUp)
     self.rcr = self.canvas.tag_bind (self.tag, "<ButtonRelease-2>", self.unpopUp)
 
   def popUp(self, event):
     self.popupLocation = [event.x, event.y, event.x + 40, event.y + 15]
     self.popup = self.canvas.create_rectangle(event.x, event.y, event.x + 40, event.y +15, fill="white", activefill="white")
-    self.popuptext = self.canvas.create_text(event.x + 20, event.y + 7.5, font=("Purisa", 10), text ="DELETE")
+    self.popuptext = self.canvas.create_text(event.x + 20, event.y + 7.5, font=("Purisa", 10), text ="DELETE",fill=Presets['Text'])
 
   def unpopUp(self, event):
     for item in self.canvas.find_overlapping(event.x, event.y, event.x, event.y):
@@ -177,24 +184,8 @@ class Module():
     self.pressedX = event.x
     self.pressedY = event.y
 
-  def connectCable(self, jack1, jack2):
-    jack1x, jack1y = jack1.getCenter()
-    jack2x, jack2y = jack2.getCenter()
-    midpointx = (jack1x + jack2x) / 2
-    midpointy = ((jack1y + jack2y) / 2) + 40
-    cable = self.canvas.create_line(jack1x, jack1y, midpointx, midpointy, jack2x, jack2y, \
-            fill=chooseCableColor.getCurrentColor(), width = Presets['CableWidth'], tags=(jack1.tag + "cable"),smooth=Presets['CableSmooth'])
-    bp = self.canvas.tag_bind (jack1.tag + " cable", "<ButtonPress-2>", jack1.popUp)
-    br = self.canvas.tag_bind (jack1.tag + " cable", "<ButtonRelease-2>", jack1.unpopUp)
-    if jack1.parent.parent.addCable(cable, jack1, jack2, bp, br) == False:
-      self.canvas.delete(cable)
-      self.canvas.delete(bp)
-      self.canvas.delete(br)
-    return 
-
 
   def onMotion(self, event):
-
     if self.canMove:
       self.canvas.tag_raise(self.tag)
       self.canvas.move(self.tag, event.x - self.pressedX, event.y - self.pressedY)
@@ -209,5 +200,44 @@ class Module():
       self.pressedX = event.x
       self.pressedY = event.y
 
+
+ 
+
+  def mapToGrid(self, event):
+        coords = self.canvas.coords(self.module)
+        x = floor((coords[0] +  (singleModuleWidth * .5)) / singleModuleWidth) * singleModuleWidth
+        y = floor((coords[1] +  (moduleHeight * .5)) / moduleHeight) * moduleHeight
+        offsetx = x - coords[0] 
+        offsety = y - coords[1] 
+        if self.canMove:
+          self.canvas.tag_raise(self.tag)
+          self.canvas.move(self.tag, offsetx, offsety)
+          for cable, jack1, jack2, bp, br in self.parent.Cables:
+            if jack1 in self.InputJacks + self.OutputJacks or jack2 in self.InputJacks + self.OutputJacks:
+                jack1x, jack1y = jack1.getCenter()
+                jack2x, jack2y = jack2.getCenter()
+                midpointx = (jack1x + jack2x) / 2
+                midpointy = ((jack1y + jack2y) / 2) + 40
+                self.parent.cablesToFront()
+                self.canvas.coords(cable, jack1x, jack1y, midpointx, midpointy, jack2x, jack2y)
+
   def shouldMove(self, truth):
     self.canMove = truth
+
+
+  def connectCable(self, jack1, jack2):
+    jack1x, jack1y = jack1.getCenter()
+    jack2x, jack2y = jack2.getCenter()
+    midpointx = (jack1x + jack2x) / 2
+    midpointy = ((jack1y + jack2y) / 2) + 40
+    cable = self.canvas.create_line(jack1x, jack1y, midpointx, midpointy, jack2x, jack2y, \
+            fill=chooseCableColor.getCurrentColor(), width = Presets['CableWidth'], tags=(jack1.tag + "cable"),smooth=Presets['CableSmooth'])
+    self.canvas.addtag_withtag(str(cable) + " cable", cable)
+
+    bp = self.canvas.tag_bind (jack1.tag + " cable", "<ButtonPress-2>", jack1.popUp)
+    br = self.canvas.tag_bind (jack1.tag + " cable", "<ButtonRelease-2>", jack1.unpopUp)
+    if jack1.parent.parent.addCable(cable, jack1, jack2, bp, br) == False:
+      self.canvas.delete(cable)
+      self.canvas.delete(bp)
+      self.canvas.delete(br)
+    return 

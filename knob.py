@@ -1,10 +1,11 @@
 import sys, os, string, time, copy
-from math import cos, sin
+from math import cos, sin, radians
 import random
 import Tkinter as tk
 from Tkinter import *
+from presets import Presets
 
-scalar = 1.0
+scalar = Presets['scalar']
 
 class Knob():
     def __init__(self, canvas, x1, y1, tag, name, title, parent):
@@ -13,9 +14,9 @@ class Knob():
       self.title = title
       self.knobtag = "K" + str(id(self))
       self.wholeKnobTag = "WK" + str(id(self))
-      self.centerx = x1 + 10 * scalar
-      self.centery = y1 + 10 * scalar
       self.r = 8 * scalar
+      self.centerx = x1 + self.r * scalar + 4
+      self.centery = y1 + self.r  * scalar 
       self.value = .5
 
 
@@ -26,20 +27,20 @@ class Knob():
       self.canvas = canvas
       self.parent = parent
       self.marks = []
-      color="red"
-      darkcolor="darkred"
+      color=Presets['KnobColor']
+      darkcolor=Presets['KnobShadow']
 
-      self.knobShadow = self.canvas.create_oval(x1+ 2,y1 + 6, x1+2*self.r, y1+2*self.r+ 6, \
+      self.knobShadow = self.canvas.create_oval(x1+ 2,y1 + 2, x1+2*self.r + 2, y1+2*self.r+ 2, \
         fill=darkcolor, outline=darkcolor,tags=(self.tag, self.knobtag))
 
-      self.knob = self.canvas.create_oval(x1+ 4,y1 + 4, x1+2*self.r + 2, y1+2*self.r + 2, \
+      self.knob = self.canvas.create_oval(x1+ 4,y1 , x1+2*self.r + 4, y1+2*self.r , \
         fill=color, outline=color,tags=(self.tag, self.knobtag))
 
       self.textID = self.canvas.create_text(self.centerx,y1+self.r*2 + 9 , \
-        font=("Purisa", 7, "bold"), text =title, tags=(self.tag, "Module"))
+        font=("Purisa", 7, "bold"), fill=Presets['Text'],text =title, tags=(self.tag, "Module"))
 
       self.knobLine = self.canvas.create_line(self.centerx, self.centery, self.centerx, self.centery - self.r, \
-        tags=(self.tag, self.knobtag), fill="white",width = 2)
+        tags=(self.tag, self.knobtag), fill=Presets['KnobTick'],width = 1)
 
       self.bp = canvas.tag_bind (self.knobtag, "<ButtonPress-1>", self.onPress)
       self.bm = canvas.tag_bind (self.knobtag, "<B1-Motion>", self.onMotion)
@@ -65,9 +66,9 @@ class Knob():
       print event.y
       self.value += (self.eventstarty - event.y) * 0.001
       self.value = max(min(self.value, 1), 0) #put between 0 and 1
-      degree = 320 * self.value
-      newx = self.centerx + self.r * cos(degree)
-      newy = self.centery - self.r * sin(degree)
+      degree = 330 * self.value - 75
+      newx = self.centerx - self.r * cos(radians(degree))
+      newy = self.centery - self.r * sin(radians(degree))
 
       self.canvas.delete(self.knobLine)
       self.knobLine = self.canvas.create_line(self.centerx, self.centery, newx, newy, \

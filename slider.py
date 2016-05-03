@@ -4,7 +4,7 @@ import Tkinter as tk
 from Tkinter import *
 from presets import Presets
 
-scalar = 1.0
+scalar = Presets['scalar']
 
 class Slider():
     def __init__(self, canvas, x1, y1, tag, name, title, parent):
@@ -16,7 +16,7 @@ class Slider():
       self.x1 = x1
       self.y1 = y1
       self.ylocation = y1+50
-      self.height = 90.0
+      self.height = Presets['ModuleHeight'] * Presets['scalar'] - 30
       self.starty = y1+50
       self.value = 0.5
       self.canvas = canvas
@@ -44,7 +44,7 @@ class Slider():
       self.sliderIDnotch = self.canvas.create_line(x1+6,y1+50, x1 + 18 * scalar, y1 + 50 * scalar, \
             tags=(self.tag, self.slidertag), fill=Presets['SliderNotch'],width = 2)
 
-      self.textID = canvas.create_text(x1+10 * scalar, y1+110 * scalar, font=Presets['SliderFont'], text=title, tags=(self.tag, "Module"))
+      self.textID = canvas.create_text(x1+10 * scalar, y1+110 * scalar,fill=Presets['Text'], font=Presets['SliderFont'], text=title, tags=(self.tag, "Module"))
       self.containerCoords = canvas.coords(self.containerID)
       self.sliderCoords = canvas.coords(self.sliderID)
 

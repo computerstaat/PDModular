@@ -1,4 +1,4 @@
-cableColor = "red"
+cableColor = "darkorchid"
 cableColors = [ "medium blue", "cyan", "chartreuse", "forest green", "goldenrod", "yellow", "orange", "red", "magenta"]
 
 class chooseCableColor():

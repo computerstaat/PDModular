@@ -1,14 +1,24 @@
 Presets = { 
-	'InputJack' : 'yellow',
-	'InputJackShadow' : 'gold',
-	'OutputJack' : 'red',
-	'OutputJackShadow'  : 'firebrick',
+	'InputJack' : 'gold',
+	'InputJackShadow' : 'darkgoldenrod',
+
+	'OutputJack' : 'firebrick',
+	'OutputJackShadow'  : 'indianred4',
+
 	'JackHole' : 'black',
-	'JackText' : 'black',
 	'JackFont' : ('Pursia', 7, 'bold'),
 
 	'CableWidth' : 3,
 	'CableSmooth' : "true",
+
+	'CaseBar' : 'grey',
+	'CaseScrew': 'black',
+	'CaseBackground': 'grey16',
+	'CaseSidePanel' : 'sienna4',
+
+	'KnobColor' : 'deepskyblue',
+	'KnobShadow' : 'royalblue',
+	'KnobTick' : 'lightslategrey',
 
 	'SliderTick' : 'lightslategrey',
 	'SliderLine' : 'black',
@@ -16,9 +26,12 @@ Presets = {
 	'Slider' : 'deepskyblue',
 	'SliderNotch' : 'white',
 	'SliderFont' : ('Purisa', 7, 'bold'),
-	'SliderText' : 'black',
 
 	'ModuleText' : 'black',
-	'Module' : 'grey',
+	'Module' : 'darkslategrey',
+	'Text' : 'grey',
+
+	'scalar' : 1.0,
+	'ModuleHeight': 130
 
 }

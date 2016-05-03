@@ -26,7 +26,7 @@ modules = {"VCO":[
     ["List", [["Output", "LP"],["Output", "HP"],["Output", "BP"],["Output", "NP"]]]
   ],
   "KNOBY": [
-    ["List", [["Knob", "FREQ", "frequency"], ["Input", "DEATH"], ["Knob","AMNT", "amout"]]]
+    ["List", [["Knob", "FOO", "foo"],["Input", "INPUT"],["Knob", "BAR", "bar"],["Output", "OUTPUT"] ]]
   ],
   "SLOPE":[
     ["Slider", "RISE", "rise"],
@@ -35,7 +35,7 @@ modules = {"VCO":[
     ["List", [["Input", "1V/O"],["Input", "VC"],["Input", "TRIG"],["Input", "INPUT"]]],
     ["List", [["Output", "GATE"],["Output", "OUT"]]],
   ],
-  "SAMPLE":[
+  "SMPL":[
     ["List", [["Input", "IN"],["Input", "GATE"],["Output", "OUT"]]],
   ],
   "SINE":[
@@ -57,7 +57,7 @@ modules = {"VCO":[
     ["Slider", "FREQ", "res"],
     ["List", [["Input", "IN"],["Output", "OUT"]]],
   ],
-  "SAWRAMP":[
+  "SWRMP":[
     ["Slider", "FREQ", "freq"],
     ["List", [["Input", "1V/O"],["Output", "RAMP"],["Output", "SAW"]]],
   ],
@@ -99,7 +99,7 @@ modules = {"VCO":[
     ["List", [["Output", "PITCH",],["Output", "VLCTY"],["Output", "GATE"]]]
   ],
   "MIXER": [
-    ["List", [["Input", "INPUT 1"],["Input", "INPUT 2"],["Input", "INPUT 3"],["Input", "INPUT 4"]]],
+    ["List", [["Input", "IN 1"],["Input", "IN 2"],["Input", "IN 3"],["Input", "IN 4"]]],
     ["Slider", "LVL 1", "level1"],
     ["Slider", "LVL 2", "level2"],
     ["Slider", "LVL 3", "level3"],

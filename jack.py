@@ -5,8 +5,9 @@ from Tkinter import *
 from ChooseCableColor import chooseCableColor
 from presets import Presets
 
-scalar = 1.0
+
 cordoffset = 2
+scalar = Presets['scalar']
 
 class Jack():
     def __init__(self, canvas, x1, y1, tag, title, parent, type):
@@ -30,7 +31,7 @@ class Jack():
       self.jackID = self.canvas.create_oval(x1+ 6,y1 + 6, x1+2*self.r , y1+2*self.r, fill=Presets['JackHole'], tags=(self.tag, self.jacktag, "Jack"))
 
       if title != "":
-        self.textID = self.canvas.create_text(self.centerx,y1+self.r*2 + 9 , font=Presets['JackFont'], text=title, tags=(self.tag, "Module"))
+        self.textID = self.canvas.create_text(self.centerx,y1+self.r*2 + 9 , font=Presets['JackFont'], text=title, tags=(self.tag, "Module"),fill=Presets['Text'])
 
       self.jackCoords = self.canvas.coords(self.jackID)
       self.bp = canvas.tag_bind (self.jacktag, "<ButtonPress-1>", self.onPress)
