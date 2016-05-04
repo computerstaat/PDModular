@@ -1,6 +1,6 @@
 Load:
-	Values sent to module should change slider location
-	Cable connections in load have not been implemented but exist in saved instance
+	Values sent to module should change slider/knob location
+
 
 
 Distributed:
@@ -22,11 +22,8 @@ Cross Platform:
 
 Future Work:
 	Mono channel on conductor for all channel processing
-	Snap to grid
 	Zoom (Proper Scaler)
 	Sort Modules into subcatagories
 
 
 
-Bugs:
-cables not moved to front after load when modules moved
