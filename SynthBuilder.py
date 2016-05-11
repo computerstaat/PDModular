@@ -19,7 +19,7 @@ import json
 import OSC
 
 PORT=8668
-IP="127.0.0.1"
+IP=Presets["pdAPI"]
 
 SizeScaler = 1.0
 CanvasWidth = 1000

@@ -1,37 +1,36 @@
 Presets = { 
-	'InputJack' : 'gold',
-	'InputJackShadow' : 'darkgoldenrod',
-
-	'OutputJack' : 'firebrick',
+	'InputJack' 		: 'gold',
+	'InputJackShadow' 	: 'darkgoldenrod',
+	'OutputJack' 		: 'firebrick',
 	'OutputJackShadow'  : 'indianred4',
+	'JackHole' 			: 'black',
+	'JackFont' 			: ('Pursia', 7, 'bold'),
 
-	'JackHole' : 'black',
-	'JackFont' : ('Pursia', 7, 'bold'),
+	'CableWidth' 		: 3,
+	'CableSmooth' 		: "true",
 
-	'CableWidth' : 3,
-	'CableSmooth' : "true",
+	'CaseBar' 			: 'grey',
+	'CaseScrew'			: 'black',
+	'CaseBackground'	: 'grey16',
+	'CaseSidePanel' 	: 'sienna4',
 
-	'CaseBar' : 'grey',
-	'CaseScrew': 'black',
-	'CaseBackground': 'grey16',
-	'CaseSidePanel' : 'sienna4',
+	'KnobColor' 		: 'deepskyblue',
+	'KnobShadow' 		: 'royalblue',
+	'KnobTick' 			: 'lightslategrey',
 
-	'KnobColor' : 'deepskyblue',
-	'KnobShadow' : 'royalblue',
-	'KnobTick' : 'lightslategrey',
+	'SliderTick' 		:	 'lightslategrey',
+	'pdAPI'				:'127.0.0.1',
+	'SliderLine' 		: 'black',
+	'SliderShadow' 		: 'royalblue',
+	'Slider' 			: 'deepskyblue',
+	'SliderNotch' 		: 'white',
+	'SliderFont' 		: ('Purisa', 7, 'bold'),
 
-	'SliderTick' : 'lightslategrey',
-	'SliderLine' : 'black',
-	'SliderShadow' : 'royalblue',
-	'Slider' : 'deepskyblue',
-	'SliderNotch' : 'white',
-	'SliderFont' : ('Purisa', 7, 'bold'),
+	'ModuleText' 		: 'black',
+	'Module' 			: 'darkslategrey',
+	'Text' 				: 'grey',
 
-	'ModuleText' : 'black',
-	'Module' : 'darkslategrey',
-	'Text' : 'grey',
-
-	'scalar' : 1.0,
-	'ModuleHeight': 130
+	'scalar' 			: 1.0,
+	'ModuleHeight'		: 130
 
 }
