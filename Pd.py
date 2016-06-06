@@ -79,7 +79,7 @@ class PD():
 
 	def systemCall(self, msg):
 		#print "MESAGE IS " + msg
-		os.system(" echo %s | /Applications/Pd-extended.app/Contents/Resources/bin/pdsend %d" % (msg, PORT))
+		os.system(" echo %s | pdsend %d" % (msg, PORT))
 		
 	def kill(self):
 		msg = "pd quit \;"

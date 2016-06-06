@@ -2,7 +2,6 @@ import sys, os, string, time, copy
 import random
 import Tkinter as tk
 from Tkinter import *
-from PIL import Image, ImageTk
 from slider import Slider
 from jack import Jack
 from knob import Knob
