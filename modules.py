@@ -76,7 +76,7 @@ modules = {"VCO":[
   ],
   "SLFO":[
     ["Slider", "FREQ", "freq"],
-    ["List", [["Inlet", "RESET"],["Output", "OUT"]]],
+    ["List", [["Input", "RESET"],["Output", "OUT"]]],
   ],
   "MLFO":[
     ["Slider", "FREQ", "freq"],
